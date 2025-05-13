@@ -34,9 +34,9 @@ class _MyHomePageState extends State<MyHomePage> {
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: AppBar(
           backgroundColor: Colors.blue,
-          title: Row(
+          title: const Row(
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 backgroundColor: Colors.white,
                 child: ClipOval(
                   child: Image(
@@ -47,8 +47,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
-              const Column(
+              SizedBox(width: 16),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -57,10 +57,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
-              const Spacer(),
-              const Icon(Icons.notifications, color: Colors.white),
-              const SizedBox(width: 8),
-              const Icon(Icons.menu, color: Colors.white),
+              Spacer(),
+              Icon(Icons.notifications, color: Colors.white),
+              SizedBox(width: 8),
+              Icon(Icons.menu, color: Colors.white),
             ],
           ),
         ),
@@ -165,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 4,
           ),
@@ -268,7 +268,7 @@ class _MyHomePageState extends State<MyHomePage> {
         const SizedBox(height: 4),
         LinearProgressIndicator(
           value: progress,
-          backgroundColor: color.withOpacity(0.2),
+          backgroundColor: color.withValues(alpha: 0.2),
           valueColor: AlwaysStoppedAnimation<Color>(color),
           minHeight: 8,
         ),
