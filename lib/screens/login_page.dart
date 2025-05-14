@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'splash_screen.dart';
+import 'signup_page.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -50,7 +51,6 @@ class LoginPage extends StatelessWidget {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  // Inside the login button onPressed callback
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
@@ -68,6 +68,36 @@ class LoginPage extends StatelessWidget {
                     'Login',
                     style: TextStyle(
                       color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Sign Up Button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SignUpPage(),
+                      ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.blue),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Sign Up',
+                    style: TextStyle(
+                      color: Colors.blue,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
