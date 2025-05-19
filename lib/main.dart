@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/login_page.dart';
-import 'screens/home_page.dart';
+import 'screens/welcome_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +21,11 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const LoginPage(),
-        '/home': (context) => const MyHomePage(),
+        '/home': (context) => WelcomePage(
+              onThemeToggle: () {
+                // Your theme toggle logic here
+              },
+            ),
       },
     );
   }

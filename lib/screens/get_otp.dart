@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'welcome_page.dart';
 
 class OTPVerificationPage extends StatefulWidget {
   const OTPVerificationPage({super.key});
@@ -105,16 +105,22 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MyHomePage(),
-                    ),
-                  );
-                  // Add verification logic here
                   String otp = _controllers.map((c) => c.text).join();
                   if (otp.length == 6) {
-                    // Verify OTP
+                    // Navigate to WelcomePage instead of HomePage
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const WelcomePage(),
+                      ),
+                    );
+                  } else {
+                    // Show error if OTP is incomplete
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please enter complete OTP'),
+                      ),
+                    );
                   }
                 },
                 style: ElevatedButton.styleFrom(

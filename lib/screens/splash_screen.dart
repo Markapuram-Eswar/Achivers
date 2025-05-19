@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
-// ignore: unused_import
-import 'login_page.dart';
+import 'welcome_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -40,7 +38,7 @@ class SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // Navigate to HomePage after 3 seconds
+    // Navigate to WelcomePage after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
       if (!mounted) return;
       Navigator.pushReplacement(
@@ -50,7 +48,7 @@ class SplashScreenState extends State<SplashScreen>
           pageBuilder: (context, animation, secondaryAnimation) {
             return FadeTransition(
               opacity: animation,
-              child: const MyHomePage(), // Changed to MyHomePage
+              child: const WelcomePage(),
             );
           },
         ),
