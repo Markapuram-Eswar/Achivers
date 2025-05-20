@@ -59,6 +59,9 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/
+    - assets/logo/logo_student.png
+    - assets/logo/logo_game.png
+    - assets/logo/logo_park.png
     - assets/videos/student_theme.mp4
     - assets/videos/game_theme.mp4
     - assets/videos/park_theme.mp4

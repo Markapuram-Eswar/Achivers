@@ -23,10 +23,34 @@ class _MyHomePageState extends State<MyHomePage> {
   late PageController _pageController;
   int _selectedIndex = 0;
 
+  final List<String> _labels = ['Home', 'Tasks', 'Achievements', 'Profile'];
+  late final Map<String, List<String>> _iconAssets;
+
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
+
+    _iconAssets = {
+      'STUDENT DISPLAY': [
+        'assets/nav_icons/student/home.png',
+        'assets/nav_icons/student/tasks.png',
+        'assets/nav_icons/student/achievements.png',
+        'assets/nav_icons/student/profile.png',
+      ],
+      'Park Display': [
+        'assets/nav_icons/park/home.png',
+        'assets/nav_icons/park/tasks.png',
+        'assets/nav_icons/park/achievements.png',
+        'assets/nav_icons/park/profile.png',
+      ],
+      'Game Display': [
+        'assets/nav_icons/game/home.png',
+        'assets/nav_icons/game/tasks.png',
+        'assets/nav_icons/game/achievements.png',
+        'assets/nav_icons/game/profile.png',
+      ],
+    };
   }
 
   @override
@@ -35,11 +59,52 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  Widget _buildNavItem(int index) {
+    final bool isSelected = _selectedIndex == index;
+    final iconPath = _iconAssets[widget.selectedTheme]?[index] ?? '';
+
+    return Expanded(
+      child: InkWell(
+        onTap: () => _onItemTapped(index),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                iconPath,
+                height: 24,
+                color: isSelected ? _getThemeColor() : Colors.grey,
+              ),
+              const SizedBox(height: 4),
+              if (isSelected)
+                Text(
+                  _labels[index],
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: _getThemeColor(),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final logoAsset = _getLogoAsset();
-    final featureIcons = _getFeatureIcons();
-
     return Container(
       decoration: _getThemeDecoration(),
       child: Scaffold(
@@ -52,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 backgroundColor: Colors.white,
                 child: ClipOval(
                   child: Image.asset(
-                    logoAsset,
+                    'assets/images/logo.png',
                     width: 35,
                     height: 35,
                     fit: BoxFit.cover,
@@ -60,56 +125,54 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text('Achievers',
-                  style: TextStyle(fontSize: 24, color: Colors.white)),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.notifications, color: Colors.white),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("No new notifications.")),
-                  );
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.brightness_6, color: Colors.white),
-                onPressed: widget.onThemeToggle ?? () {},
-              ),
-              IconButton(
-                icon: const Icon(Icons.menu, color: Colors.white),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Menu not implemented.")),
-                  );
-                },
+              Text(
+                _labels[_selectedIndex],
+                style: const TextStyle(
+                  fontSize: 24,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.notifications, color: Colors.white),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("No new notifications.")),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.brightness_6, color: Colors.white),
+              onPressed: widget.onThemeToggle ?? () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Menu not implemented.")),
+                );
+              },
+            ),
+          ],
         ),
         body: PageView(
           controller: _pageController,
           onPageChanged: (index) => setState(() => _selectedIndex = index),
           children: [
-            _buildHomePage(context, featureIcons),
+            _buildHomePage(context, _getFeatureIcons()),
             const TasksScreen(),
             const AchievementsScreen(),
             const ProfilePage(),
           ],
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: _getThemeColor(),
-          unselectedItemColor: Colors.grey,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.assignment), label: 'Tasks'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.emoji_events), label: 'Achievements'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          ],
+        bottomNavigationBar: Container(
+          color: Colors.white,
+          child: Row(
+            children:
+                List.generate(_labels.length, (index) => _buildNavItem(index)),
+          ),
         ),
       ),
     );
@@ -234,11 +297,11 @@ class _MyHomePageState extends State<MyHomePage> {
   String _getLogoAsset() {
     switch (widget.selectedTheme) {
       case 'STUDENT DISPLAY':
-        return 'assets/images/logo_student.png';
+        return 'assets/logo/logo_student.png';
       case 'Park Display':
-        return 'assets/images/logo_park.png';
+        return 'assets/logo/logo_park.png';
       case 'Game Display':
-        return 'assets/images/logo_game.png';
+        return 'assets/logo/logo_game.png';
       default:
         return 'assets/images/logo.png';
     }
@@ -275,16 +338,5 @@ class _MyHomePageState extends State<MyHomePage> {
           'progress': Icons.show_chart,
         };
     }
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      _pageController.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    });
   }
 }

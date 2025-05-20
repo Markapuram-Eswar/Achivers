@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'welcome_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -38,21 +37,10 @@ class SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // Navigate to WelcomePage after 3 seconds
+    // Navigate to LoginPage after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 800),
-          pageBuilder: (context, animation, secondaryAnimation) {
-            return FadeTransition(
-              opacity: animation,
-              child: const WelcomePage(),
-            );
-          },
-        ),
-      );
+      Navigator.pushReplacementNamed(context, '/login');
     });
   }
 
@@ -71,52 +59,35 @@ class SplashScreenState extends State<SplashScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.blue,
-              Colors.blue,
+              Color(0xFFd3e5ff), // light blue top left
+              Color(0xFFb7ccf7), // slightly deeper blue bottom right
             ],
           ),
         ),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Animated Logo
-              AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _scaleAnimation.value,
-                    child: Transform.rotate(
-                      angle: _rotateAnimation.value,
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        width: 150,
-                        height: 150,
-                      ),
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: _scaleAnimation.value,
+                child: Transform.rotate(
+                  angle: _rotateAnimation.value,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFDF6E3),
+                      borderRadius: BorderRadius.circular(32),
+                      border: Border.all(color: Color(0xFFD4B97F), width: 2),
                     ),
-                  );
-                },
-              ),
-              const SizedBox(height: 40),
-
-              // App Name
-              const Text(
-                'Achievers',
-                style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 2,
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 200,
+                      height: 200,
+                    ),
+                  ),
                 ),
-              ),
-
-              const SizedBox(height: 40),
-
-              // Loading Indicator
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),

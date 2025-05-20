@@ -78,69 +78,19 @@ class _ThemeSplashScreenState extends State<ThemeSplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          if (_isVideoInitialized)
-            FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                width: _videoController.value.size.width,
-                height: _videoController.value.size.height,
-                child: VideoPlayer(_videoController),
+      body: _isVideoInitialized
+          ? SizedBox.expand(
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: _videoController.value.size.width,
+                  height: _videoController.value.size.height,
+                  child: VideoPlayer(_videoController),
+                ),
               ),
             )
-          else
-            Container(
-              decoration: BoxDecoration(
-                gradient: _getThemeGradient(),
-              ),
-            ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/images/logo.png',
-                  width: 150,
-                  height: 150,
-                ),
-                const SizedBox(height: 24),
-                const CircularProgressIndicator(color: Colors.white),
-              ],
-            ),
-          ),
-        ],
-      ),
+          : const Center(
+              child: CircularProgressIndicator()), // Only shows while loading
     );
-  }
-
-  LinearGradient _getThemeGradient() {
-    switch (widget.selectedTheme) {
-      case 'STUDENT DISPLAY':
-        return const LinearGradient(
-          colors: [Color(0xFFE0F7FA), Colors.white],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        );
-      case 'Park Display':
-        return const LinearGradient(
-          colors: [Color(0xFF81C784), Color(0xFFA5D6A7)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        );
-      case 'Game Display':
-        return const LinearGradient(
-          colors: [Color(0xFFFF8A65), Color(0xFFFFAB91)],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        );
-      default:
-        return const LinearGradient(
-          colors: [Color(0xFFE0F7FA), Colors.white],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        );
-    }
   }
 }
