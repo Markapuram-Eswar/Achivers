@@ -130,6 +130,8 @@ class _WelcomePageState extends State<WelcomePage> {
                                   const EdgeInsets.symmetric(vertical: 6.0),
                               child: SizedBox(
                                 width: double.infinity,
+                                height:
+                                    60, // Increase height for better touch target
                                 child: ElevatedButton(
                                   onPressed: () {
                                     setState(() {
@@ -145,7 +147,7 @@ class _WelcomePageState extends State<WelcomePage> {
                                         : _getThemeColor(),
                                     side: BorderSide(color: _getThemeColor()),
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 16),
+                                        vertical: 20), // Increased padding
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
@@ -154,7 +156,7 @@ class _WelcomePageState extends State<WelcomePage> {
                                     theme,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                                      fontSize: 18, // Increased font size
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
@@ -166,10 +168,10 @@ class _WelcomePageState extends State<WelcomePage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 60),
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: 60, // Increased from 50 to 60
                     child: ElevatedButton(
                       onPressed: () {
                         if (_selectedTheme.isNotEmpty) {
@@ -189,11 +191,14 @@ class _WelcomePageState extends State<WelcomePage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
+                        // Add padding to make button content larger
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                       child: const Text(
                         'Get Started',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 20, // Increased from 18 to 20
+                          fontWeight: FontWeight.bold, // Added bold
                           color: Colors.white,
                         ),
                       ),

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'profile_page.dart';
 import 'achievements_screen.dart';
 import 'tasks_screen.dart';
+import 'doubts_page.dart'; // Add this import
 import 'reports_zone_page.dart';
 import 'timetable_page.dart';
 import 'welcome_page.dart';
 import 'progress_page.dart';
+import 'practice_page.dart';
 
 class MyHomePage extends StatefulWidget {
   final VoidCallback? onThemeToggle;
@@ -129,9 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
           actions: [
             InkWell(
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("No new notifications.")),
-                );
+                Navigator.pushNamed(context, '/notifications');
               },
               child: Container(
                 width: 32,
@@ -227,7 +227,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 _buildFeatureCard(
                     'Practice Zone',
                     Colors.orange,
-                    () => const TasksScreen(),
+                    () => PracticePage(),
                     'https://img.icons8.com/isometric/50/minecraft-logo.png'),
                 _buildFeatureCard(
                     'Test Zone',
@@ -237,7 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 _buildFeatureCard(
                     'Doubts Section',
                     Colors.teal,
-                    () => const TasksScreen(),
+                    () => DoubtsPage(),
                     'https://img.icons8.com/isometric/50/speech-bubble-with-dots--v1.png'),
                 _buildFeatureCard(
                     'Reports',

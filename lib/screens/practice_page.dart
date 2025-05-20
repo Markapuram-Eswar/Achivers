@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'subject_practice_page.dart';
 
 class PracticePage extends StatefulWidget {
   const PracticePage({Key? key}) : super(key: key);
@@ -45,6 +46,24 @@ class _PracticePageState extends State<PracticePage> {
       'questions': 80,
       'completed': 36,
     },
+    {
+      'title': 'Telugu',
+      'subtitle': 'Grammar, Literature, Comprehension',
+      'icon': 'https://img.icons8.com/isometric/50/literature.png',
+      'color': Colors.pink,
+      'progress': 0.55,
+      'questions': 90,
+      'completed': 50,
+    },
+    {
+      'title': 'Hindi',
+      'subtitle': 'Grammar, Literature, Vocabulary',
+      'icon': 'https://img.icons8.com/isometric/50/book-reading.png',
+      'color': Colors.amber,
+      'progress': 0.40,
+      'questions': 85,
+      'completed': 34,
+    },
   ];
 
   final List<Map<String, dynamic>> _recentPractice = [
@@ -75,7 +94,8 @@ class _PracticePageState extends State<PracticePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Practice Zone', style: TextStyle(color: Colors.white)),
+        title:
+            const Text('Practice Zone', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.orange,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -115,7 +135,7 @@ class _PracticePageState extends State<PracticePage> {
               height: 140,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: _recentPractice.length,
+                itemCount: _recentPractice.take(2).length,
                 itemBuilder: (context, index) {
                   final item = _recentPractice[index];
                   return Container(
@@ -236,12 +256,25 @@ class _PracticePageState extends State<PracticePage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Column(
                     children: [
-                      _buildQuickPracticeButton('5 Questions', Icons.looks_5),
-                      _buildQuickPracticeButton('10 Questions', Icons.looks_one),
-                      _buildQuickPracticeButton('15 Questions', Icons.filter_1),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildQuickPracticeButton(
+                              '5 Questions', Icons.looks_5),
+                          const SizedBox(
+                              width:
+                                  20), // Adjust this width value to control the gap
+                          _buildQuickPracticeButton(
+                              '10 Questions', Icons.looks_one),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Center(
+                        child: _buildQuickPracticeButton(
+                            '15 Questions', Icons.filter_1),
+                      ),
                     ],
                   ),
                 ],
@@ -255,7 +288,7 @@ class _PracticePageState extends State<PracticePage> {
 
   Widget _buildPracticeCard(Map<String, dynamic> item) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      // Remove margin-bottom since we're scrolling horizontally now
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -275,6 +308,14 @@ class _PracticePageState extends State<PracticePage> {
           borderRadius: BorderRadius.circular(16),
           onTap: () {
             // Navigate to subject practice
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SubjectPracticePage(
+                  subjectData: item,
+                ),
+              ),
+            );
           },
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -334,7 +375,8 @@ class _PracticePageState extends State<PracticePage> {
                           LinearProgressIndicator(
                             value: item['progress'],
                             backgroundColor: Colors.grey[200],
-                            valueColor: AlwaysStoppedAnimation<Color>(item['color']),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(item['color']),
                             minHeight: 8,
                             borderRadius: BorderRadius.circular(4),
                           ),
