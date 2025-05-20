@@ -27,17 +27,11 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: const Text(
-          'Account',
-          style: TextStyle(color: Colors.white, fontSize: 24),
-        ),
-      ),
+      // Removed the AppBar completely
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
+          const SizedBox(height: 40), // Added extra padding at the top
           Center(
             child: GestureDetector(
               onTap: _pickImage,
@@ -46,10 +40,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   CircleAvatar(
                     radius: 50,
                     backgroundColor: Colors.blue.shade100,
-                    backgroundImage: _image != null
-                        ? FileImage(_image!)
-                        : const AssetImage('assets/images/logo.png')
-                            as ImageProvider,
+                    backgroundImage: _image != null ? FileImage(_image!) : null,
                     child: _image == null
                         ? const Icon(Icons.person, size: 50, color: Colors.blue)
                         : null,

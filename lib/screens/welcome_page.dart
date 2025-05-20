@@ -64,129 +64,143 @@ class _WelcomePageState extends State<WelcomePage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/images/logo.png',
-                  height: 200,
-                ),
-                const SizedBox(height: 40),
-                Text(
-                  'Welcome to Achievers',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: _getThemeColor(),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  Image.network(
+                    'https://img.icons8.com/isometric/50/minecraft-logo.png',
+                    height: 100,
+                    width: 100,
                   ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Your journey to success starts here',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: _getThemeColor().withOpacity(0.7),
+                  const SizedBox(height: 40),
+                  Text(
+                    'Welcome to Achievers',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: _getThemeColor(),
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 4,
-                      ),
-                    ],
+                  const SizedBox(height: 16),
+                  Text(
+                    'Your journey to success starts here',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: _getThemeColor().withOpacity(0.7),
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Select Theme',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: _getThemeColor(),
+                  const SizedBox(height: 40),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Select Theme',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: _getThemeColor(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Column(
+                          children: [
+                            'STUDENT DISPLAY',
+                            'Park Display',
+                            'Game Display'
+                          ].map((theme) {
+                            final isSelected = _selectedTheme == theme;
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 6.0),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedTheme = theme;
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: isSelected
+                                        ? _getThemeColor()
+                                        : Colors.white,
+                                    foregroundColor: isSelected
+                                        ? Colors.white
+                                        : _getThemeColor(),
+                                    side: BorderSide(color: _getThemeColor()),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    theme,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_selectedTheme.isNotEmpty) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ThemeSplashScreen(
+                                selectedTheme: _selectedTheme,
+                                onThemeToggle: widget.onThemeToggle,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _getThemeColor(),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      RadioListTile<String>(
-                        title: const Text('STUDENT DISPLAY'),
-                        value: 'STUDENT DISPLAY',
-                        groupValue: _selectedTheme,
-                        activeColor: _getThemeColor(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedTheme = value!;
-                          });
-                        },
-                      ),
-                      RadioListTile<String>(
-                        title: const Text('Park Display'),
-                        value: 'Park Display',
-                        groupValue: _selectedTheme,
-                        activeColor: _getThemeColor(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedTheme = value!;
-                          });
-                        },
-                      ),
-                      RadioListTile<String>(
-                        title: const Text('Game Display'),
-                        value: 'Game Display',
-                        groupValue: _selectedTheme,
-                        activeColor: _getThemeColor(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedTheme = value!;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 40),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_selectedTheme.isNotEmpty) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ThemeSplashScreen(
-                              selectedTheme: _selectedTheme,
-                              onThemeToggle: widget.onThemeToggle,
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _getThemeColor(),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'Get Started',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
+                      child: const Text(
+                        'Get Started',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

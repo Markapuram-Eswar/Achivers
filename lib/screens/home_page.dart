@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'profile_page.dart';
 import 'achievements_screen.dart';
 import 'tasks_screen.dart';
-import 'progress_screen.dart';
+import 'reports_zone_page.dart';
 import 'timetable_page.dart';
+import 'welcome_page.dart';
+import 'progress_page.dart';
 
 class MyHomePage extends StatefulWidget {
   final VoidCallback? onThemeToggle;
@@ -23,34 +25,12 @@ class _MyHomePageState extends State<MyHomePage> {
   late PageController _pageController;
   int _selectedIndex = 0;
 
-  final List<String> _labels = ['Home', 'Tasks', 'Achievements', 'Profile'];
-  late final Map<String, List<String>> _iconAssets;
+  final List<String> _labels = ['Home', 'Classes', 'Achievements', 'Profile'];
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
-
-    _iconAssets = {
-      'STUDENT DISPLAY': [
-        'assets/nav_icons/student/home.png',
-        'assets/nav_icons/student/tasks.png',
-        'assets/nav_icons/student/achievements.png',
-        'assets/nav_icons/student/profile.png',
-      ],
-      'Park Display': [
-        'assets/nav_icons/park/home.png',
-        'assets/nav_icons/park/tasks.png',
-        'assets/nav_icons/park/achievements.png',
-        'assets/nav_icons/park/profile.png',
-      ],
-      'Game Display': [
-        'assets/nav_icons/game/home.png',
-        'assets/nav_icons/game/tasks.png',
-        'assets/nav_icons/game/achievements.png',
-        'assets/nav_icons/game/profile.png',
-      ],
-    };
   }
 
   @override
@@ -72,27 +52,38 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildNavItem(int index) {
     final bool isSelected = _selectedIndex == index;
-    final iconPath = _iconAssets[widget.selectedTheme]?[index] ?? '';
+    final List<String> iconUrls = [
+      'https://img.icons8.com/arcade/64/country-house.png',
+      'https://img.icons8.com/arcade/64/15.png',
+      'https://img.icons8.com/arcade/64/new-post--v2.png',
+      'https://img.icons8.com/arcade/64/gender-neutral-user--v2.png',
+    ];
+    final iconUrl = iconUrls[index];
 
     return Expanded(
       child: InkWell(
         onTap: () => _onItemTapped(index),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(
-                iconPath,
-                height: 24,
-                color: isSelected ? _getThemeColor() : Colors.grey,
+              Container(
+                width: 32,
+                height: 36,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(iconUrl),
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               if (isSelected)
                 Text(
                   _labels[index],
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 11,
                     color: _getThemeColor(),
                   ),
                 ),
@@ -110,6 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: _getThemeColor(),
           title: Row(
             children: [
@@ -125,9 +117,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                _labels[_selectedIndex],
-                style: const TextStyle(
+              const Text(
+                'Achievers',
+                style: TextStyle(
                   fontSize: 24,
                   color: Colors.white,
                 ),
@@ -135,25 +127,65 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications, color: Colors.white),
-              onPressed: () {
+            InkWell(
+              onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("No new notifications.")),
                 );
               },
+              child: Container(
+                width: 32,
+                height: 32,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(
+                        'https://img.icons8.com/isometric/50/appointment-reminders.png'),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
             ),
-            IconButton(
-              icon: const Icon(Icons.brightness_6, color: Colors.white),
-              onPressed: widget.onThemeToggle ?? () {},
+            InkWell(
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const WelcomePage(),
+                  ),
+                );
+              },
+              child: Container(
+                width: 32,
+                height: 32,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(
+                        'https://img.icons8.com/isometric/50/video-card.png'),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
             ),
-            IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white),
-              onPressed: () {
+            InkWell(
+              onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Menu not implemented.")),
                 );
               },
+              child: Container(
+                width: 32,
+                height: 32,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(
+                        'https://img.icons8.com/ios-filled/50/menu--v1.png'),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -161,8 +193,8 @@ class _MyHomePageState extends State<MyHomePage> {
           controller: _pageController,
           onPageChanged: (index) => setState(() => _selectedIndex = index),
           children: [
-            _buildHomePage(context, _getFeatureIcons()),
-            const TasksScreen(),
+            _buildHomePage(context),
+            AttendanceCalendarPage(),
             const AchievementsScreen(),
             const ProfilePage(),
           ],
@@ -178,7 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildHomePage(BuildContext context, Map<String, IconData> icons) {
+  Widget _buildHomePage(BuildContext context) {
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -192,18 +224,36 @@ class _MyHomePageState extends State<MyHomePage> {
               spacing: 20,
               runSpacing: 16,
               children: [
-                _buildFeatureCard('Practice Zone', Colors.orange,
-                    icons['practice']!, () => const TasksScreen()),
-                _buildFeatureCard('Test Zone', Colors.pinkAccent,
-                    icons['test']!, () => const TasksScreen()),
-                _buildFeatureCard('Doubts Section', Colors.teal,
-                    icons['doubts']!, () => const TasksScreen()),
-                _buildFeatureCard('Reports', Colors.blue, icons['reports']!,
-                    () => const TasksScreen()),
-                _buildFeatureCard('Classtable', Colors.purple,
-                    icons['timetable']!, () => TimetablePage()),
-                _buildFeatureCard('Progress', Colors.yellow[700]!,
-                    icons['progress']!, () => ProgressZonePage()),
+                _buildFeatureCard(
+                    'Practice Zone',
+                    Colors.orange,
+                    () => const TasksScreen(),
+                    'https://img.icons8.com/isometric/50/minecraft-logo.png'),
+                _buildFeatureCard(
+                    'Test Zone',
+                    Colors.pinkAccent,
+                    () => const TasksScreen(),
+                    'https://img.icons8.com/isometric/50/test-tube.png'),
+                _buildFeatureCard(
+                    'Doubts Section',
+                    Colors.teal,
+                    () => const TasksScreen(),
+                    'https://img.icons8.com/isometric/50/speech-bubble-with-dots--v1.png'),
+                _buildFeatureCard(
+                    'Reports',
+                    Colors.blue,
+                    () => ReportsZonePage(),
+                    'https://img.icons8.com/isometric/50/report-card.png'),
+                _buildFeatureCard(
+                    'Classtable',
+                    Colors.purple,
+                    () => AttendanceCalendarPage(),
+                    'https://img.icons8.com/isometric/50/stopwatch.png'),
+                _buildFeatureCard(
+                    'Progress',
+                    Colors.yellow[700]!,
+                    () => ProgressPage(),
+                    'https://img.icons8.com/isometric/50/positive-dynamic.png'),
               ],
             ),
           ],
@@ -212,8 +262,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildFeatureCard(
-      String title, Color color, IconData icon, Widget Function() pageBuilder) {
+  Widget _buildFeatureCard(String title, Color color,
+      Widget Function() pageBuilder, String iconUrl) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.4,
       height: 120,
@@ -229,7 +279,16 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 32, color: Colors.white),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(iconUrl),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
               const SizedBox(height: 8),
               Text(
                 title,
@@ -304,39 +363,6 @@ class _MyHomePageState extends State<MyHomePage> {
         return 'assets/logo/logo_game.png';
       default:
         return 'assets/images/logo.png';
-    }
-  }
-
-  Map<String, IconData> _getFeatureIcons() {
-    switch (widget.selectedTheme) {
-      case 'Park Display':
-        return {
-          'practice': Icons.eco,
-          'test': Icons.bug_report,
-          'doubts': Icons.nature_people,
-          'reports': Icons.park,
-          'timetable': Icons.grass,
-          'progress': Icons.spa,
-        };
-      case 'Game Display':
-        return {
-          'practice': Icons.sports_esports,
-          'test': Icons.videogame_asset,
-          'doubts': Icons.help,
-          'reports': Icons.leaderboard,
-          'timetable': Icons.timer,
-          'progress': Icons.trending_up,
-        };
-      case 'STUDENT DISPLAY':
-      default:
-        return {
-          'practice': Icons.auto_graph,
-          'test': Icons.science,
-          'doubts': Icons.question_answer,
-          'reports': Icons.bar_chart,
-          'timetable': Icons.schedule,
-          'progress': Icons.show_chart,
-        };
     }
   }
 }

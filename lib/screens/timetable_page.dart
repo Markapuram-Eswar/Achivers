@@ -1,248 +1,253 @@
-import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:table_calendar/table_calendar.dart';
 
-// Main page that combines the calendar view and tabs for Attendance, Holiday, and Today's Classes
-class TimetablePage extends StatefulWidget {
+class AttendanceCalendarPage extends StatefulWidget {
   @override
-  _TimetablePageState createState() => _TimetablePageState();
+  _AttendanceCalendarPageState createState() => _AttendanceCalendarPageState();
 }
 
-class _TimetablePageState extends State<TimetablePage> {
-  late DateTime _selectedDay;
+class _AttendanceCalendarPageState extends State<AttendanceCalendarPage> {
   late DateTime _focusedDay;
-  Map<DateTime, String> _attendanceStatus = {}; // For storing attendance status
+  late DateTime _selectedDay;
+  Map<DateTime, Map<String, String>> _attendanceStatus = {};
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _selectedDay = DateTime.now();
     _focusedDay = DateTime.now();
+    _selectedDay = DateTime.now();
+    _loadAttendance();
   }
 
-  // Function to fetch attendance data from the backend for the selected day
-  Future<void> fetchAttendanceData(String userId, String month) async {
+  Future<void> _loadAttendance() async {
     try {
-      final response = await http.get(
-        Uri.parse('http://your-api-url/attendance/$userId?month=$month'),
-      );
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        // Process and update the UI with the fetched data
-        setState(() {
-          _attendanceStatus = Map.fromIterable(
-            data,
-            key: (item) => DateTime.parse(item['date']),
-            value: (item) => item['status'],
-          );
-        });
-      } else {
-        throw Exception('Failed to load attendance data');
-      }
+      final data = await fetchAttendanceFromBackend();
+      setState(() {
+        _attendanceStatus = data;
+        _isLoading = false;
+      });
     } catch (e) {
-      print(e);
+      setState(() => _isLoading = false);
+      print("Error fetching attendance: $e");
     }
   }
 
-  // Get color for each day's attendance status
-  Color _getDayColor(DateTime date) {
-    String? status = _attendanceStatus[date];
-    switch (status) {
+  Future<Map<DateTime, Map<String, String>>>
+      fetchAttendanceFromBackend() async {
+    await Future.delayed(Duration(seconds: 2));
+
+    final response = jsonEncode([
+      {"date": "2025-05-01", "status": "Present"},
+      {"date": "2025-05-02", "status": "Absent"},
+      {"date": "2025-05-03", "status": "Holiday", "reason": "Good Friday"},
+      {"date": "2025-05-23", "status": "Holiday", "reason": "Founders' Day"},
+      {"date": "2025-05-04", "status": "Present"},
+      {"date": "2025-05-05", "status": "Absent"},
+    ]);
+
+    final List<dynamic> decoded = json.decode(response);
+    final Map<DateTime, Map<String, String>> result = {};
+
+    for (var item in decoded) {
+      final dateParts = item['date'].split('-').map(int.parse).toList();
+      final date = DateTime.utc(dateParts[0], dateParts[1], dateParts[2]);
+      result[date] = {
+        'status': item['status'],
+        'reason': item['reason'] ?? '',
+      };
+    }
+
+    return result;
+  }
+
+  Color _getStatusColor(DateTime date) {
+    final data =
+        _attendanceStatus[DateTime.utc(date.year, date.month, date.day)];
+    switch (data?['status']) {
       case 'Present':
-        return Colors.blue; // Attended
+        return Colors.green;
       case 'Absent':
-        return Colors.red; // Absent
+        return Colors.red;
       case 'Holiday':
-        return Colors.green; // Holiday
+        return Colors.blue;
       default:
-        return Colors.transparent; // No data yet
+        return Colors.transparent;
     }
   }
 
+  List<Widget> _buildHolidayList() {
+    final holidays = _attendanceStatus.entries
+        .where((entry) => entry.value['status'] == 'Holiday')
+        .map((entry) => ListTile(
+              title: Text(
+                '${entry.key.toLocal()}'.split(' ')[0],
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(entry.value['reason']?.isNotEmpty == true
+                  ? entry.value['reason']!
+                  : 'Holiday'),
+            ))
+        .toList();
+    return holidays;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Class Timetable"),
+        title: Text('Attendance Calendar'),
       ),
-      body: Column(
-        children: [
-          TableCalendar(
-            firstDay: DateTime.utc(2020, 1, 1),
-            lastDay: DateTime.utc(2025, 12, 31),
-            focusedDay: _focusedDay,
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
-              fetchAttendanceData(
-                  "user123", "2025-05"); // Fetch attendance for selected month
-            },
-            calendarBuilders: CalendarBuilders(
-              selectedBuilder: (context, date, events) {
-                return Container(
-                  margin: const EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
-                    color: Colors.blue, // selected day color
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(child: Text('${date.day}')),
-                );
-              },
-              defaultBuilder: (context, date, events) {
-                return Container(
-                  margin: const EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
-                    color: _getDayColor(date),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(child: Text('${date.day}')),
-                );
-              },
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                          ),
+                        ],
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      padding: EdgeInsets.all(12),
+                      child: TableCalendar(
+                        firstDay: DateTime.utc(2020, 1, 1),
+                        lastDay: DateTime.utc(2030, 12, 31),
+                        focusedDay: _focusedDay,
+                        selectedDayPredicate: (day) =>
+                            isSameDay(_selectedDay, day),
+                        onDaySelected: (selectedDay, focusedDay) {
+                          setState(() {
+                            _selectedDay = selectedDay;
+                            _focusedDay = focusedDay;
+                          });
+                        },
+                        calendarStyle: CalendarStyle(
+                          todayDecoration: BoxDecoration(
+                            color: Colors.orangeAccent,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        calendarBuilders: CalendarBuilders(
+                          defaultBuilder: (context, date, _) {
+                            final color = _getStatusColor(date);
+                            return Container(
+                              margin: const EdgeInsets.all(6.0),
+                              decoration: BoxDecoration(
+                                color: color,
+                                shape: BoxShape.circle,
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                '${date.day}',
+                                style: TextStyle(
+                                  color: color == Colors.transparent
+                                      ? Colors.black
+                                      : Colors.white,
+                                ),
+                              ),
+                            );
+                          },
+                          selectedBuilder: (context, date, _) {
+                            return Container(
+                              margin: const EdgeInsets.all(6.0),
+                              decoration: BoxDecoration(
+                                color: Colors.orange,
+                                shape: BoxShape.circle,
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                '${date.day}',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    LegendRow(),
+                    Divider(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text(
+                        'List of Holidays:',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      padding: EdgeInsets.all(8),
+                      height: 300,
+                      child: ListView(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        children: _buildHolidayList(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          // Tabs for Attendance, Holiday, and Today's Classes
-          Expanded(
-            child: TimetableTabs(),
-          ),
+    );
+  }
+}
+
+class LegendRow extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          LegendItem(color: Colors.green, label: 'Present'),
+          LegendItem(color: Colors.red, label: 'Absent'),
+          LegendItem(color: Colors.blue, label: 'Holiday'),
         ],
       ),
     );
   }
 }
 
-// Tabs widget to display different sections like Attendance, Holiday, and Today's Classes
-class TimetableTabs extends StatefulWidget {
-  @override
-  _TimetableTabsState createState() => _TimetableTabsState();
-}
+class LegendItem extends StatelessWidget {
+  final Color color;
+  final String label;
 
-class _TimetableTabsState extends State<TimetableTabs>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
+  LegendItem({required this.color, required this.label});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: "Attendance"),
-            Tab(text: "Holiday"),
-            Tab(text: "Today's Classes"),
-          ],
+    return Row(
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          AttendanceTab(), // Attendance Tab
-          HolidayTab(), // Holiday Tab
-          TimetableTab(), // Today's Classes Tab
-        ],
-      ),
-    );
-  }
-}
-
-// Attendance Tab widget
-class AttendanceTab extends StatelessWidget {
-  final List<Map<String, dynamic>> subjectAttendance = [
-    {"subject": "Math", "attendance": 95},
-    {"subject": "Physics", "attendance": 85},
-    {"subject": "Chemistry", "attendance": 90},
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: subjectAttendance.length,
-      itemBuilder: (context, index) {
-        final subject = subjectAttendance[index];
-        return Card(
-          margin: EdgeInsets.all(10),
-          child: ListTile(
-            title: Text(subject["subject"]),
-            subtitle: Text("Attendance: ${subject["attendance"]}%"),
-            trailing: CircularProgressIndicator(
-              value: subject["attendance"] / 100,
-              strokeWidth: 6,
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-// Holiday Tab widget
-class HolidayTab extends StatelessWidget {
-  final List<Map<String, dynamic>> holidays = [
-    {"date": "2025-05-01", "reason": "Lab Holiday"},
-    {"date": "2025-05-02", "reason": "Public Holiday"},
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: holidays.length,
-      itemBuilder: (context, index) {
-        final holiday = holidays[index];
-        return Card(
-          margin: EdgeInsets.all(10),
-          child: ListTile(
-            title: Text("Holiday: ${holiday['date']}"),
-            subtitle: Text("Reason: ${holiday['reason']}"),
-          ),
-        );
-      },
-    );
-  }
-}
-
-// Today's Classes Tab widget
-class TimetableTab extends StatelessWidget {
-  final List<Map<String, dynamic>> classes = [
-    {
-      "subject": "Mathematics",
-      "start_time": "10:00",
-      "end_time": "11:30",
-      "teacher_name": "Prof. John"
-    },
-    {
-      "subject": "Physics",
-      "start_time": "12:00",
-      "end_time": "13:30",
-      "teacher_name": "Prof. Sarah"
-    },
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: classes.length,
-      itemBuilder: (context, index) {
-        final classDetails = classes[index];
-        return Card(
-          margin: EdgeInsets.all(10),
-          child: ListTile(
-            title: Text(classDetails["subject"]),
-            subtitle: Text(
-                "Time: ${classDetails['start_time']} - ${classDetails['end_time']}"),
-            trailing: Text("Teacher: ${classDetails['teacher_name']}"),
-          ),
-        );
-      },
+        SizedBox(width: 8),
+        Text(label),
+      ],
     );
   }
 }
